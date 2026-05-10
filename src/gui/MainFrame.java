@@ -6,25 +6,64 @@ import gui.GraphState;
 import models.Graph;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class MainFrame extends JFrame {
+    private GraphPanel graphPanel;
+    private GraphState state;
+
     public MainFrame(Graph graph) {
-        // 1. Tworzymy stan widoku
-        GraphState state = new GraphState();
+        setTitle("Graph Interactor Pro");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1000, 700);
+        setLayout(new BorderLayout());
 
-        // 2. Tworzymy panel i przekazujemy mu stan
-        GraphPanel panel = new GraphPanel(graph, state);
+        state = new GraphState();
+        graphPanel = new GraphPanel(graph, state);
 
-        // 3. Tworzymy kontroler i przekazujemy mu wszystko
-        GraphController controller = new GraphController(graph, state, panel);
+        // 1. Tworzymy kontroler
+        GraphController controller = new GraphController(graph, state, graphPanel);
 
-        // 4. Podpinamy kontroler pod panel
-        panel.addMouseListener(controller);
-        panel.addMouseMotionListener(controller);
-        panel.addMouseWheelListener(controller);
+        graphPanel.addMouseListener(controller);
+        graphPanel.addMouseMotionListener(controller);
+        graphPanel.addMouseWheelListener(controller);
 
-        add(panel);
-        setSize(800, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // 2. Przekazujemy controller do metody createToolBar
+        JToolBar toolBar = createToolBar(controller);
+
+        add(toolBar, BorderLayout.NORTH);
+        add(graphPanel, BorderLayout.CENTER);
+
+        setLocationRelativeTo(null);
+    }
+
+    // 3. Dodajemy argument GraphController controller
+    private JToolBar createToolBar(GraphController controller) {
+        JToolBar bar = new JToolBar();
+        bar.setFloatable(false);
+
+        JButton btnCenter = new JButton("Centruj Graf");
+        JButton btnZoomIn = new JButton("Zoom +");
+        JButton btnZoomOut = new JButton("Zoom -");
+        JButton btnSave = new JButton("Zapisz Coords");
+
+        btnCenter.addActionListener(e -> graphPanel.centerView());
+
+        // Teraz controller jest dostępny!
+        btnZoomIn.addActionListener(e -> controller.zoomAroundCenter(1.2));
+        btnZoomOut.addActionListener(e -> controller.zoomAroundCenter(0.8));
+
+        bar.add(btnCenter);
+        bar.addSeparator();
+        bar.add(btnZoomIn);
+        bar.add(btnZoomOut);
+        bar.add(Box.createHorizontalGlue());
+        bar.add(btnSave);
+
+        return bar;
+    }
+
+    public GraphPanel getGraphPanel() {
+        return graphPanel;
     }
 }

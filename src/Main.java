@@ -25,11 +25,10 @@ public class Main {
             // 4. Uruchamiamy GUI w wątku zdarzeń Swinga
             SwingUtilities.invokeLater(() -> {
                 MainFrame frame = new MainFrame(graph);
-
-                // Ustawiamy widoczność na końcu
                 frame.setVisible(true);
 
-                System.out.println("Aplikacja uruchomiona pomyślnie!");
+                // To sprawi, że graf "rozstrzeli się" z rogu na całe okno automatycznie
+                frame.getGraphPanel().centerView();
             });
 
         } catch (Exception e) {

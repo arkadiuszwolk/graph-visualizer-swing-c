@@ -92,4 +92,48 @@ public class GraphPanel extends JPanel {
         g2d.drawOval(x - r, y - r, r * 2, r * 2);
         g2d.drawString(v.getId(), x + r + 2, y);
     }
+
+    public void centerView() {
+        if (graph.getVertices().isEmpty()) return;
+
+        // 1. Szukamy skrajnych współrzędnych (Bounding Box)
+        double minX = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+
+        for (Vertex v : graph.getVertices()) {
+            if (v.getX() < minX) minX = v.getX();
+            if (v.getX() > maxX) maxX = v.getX();
+            if (v.getY() < minY) minY = v.getY();
+            if (v.getY() > maxY) maxY = v.getY();
+        }
+
+        // 2. Obliczamy fizyczny rozmiar grafu w "świecie"
+        double graphWidth = maxX - minX;
+        double graphHeight = maxY - minY;
+
+        // Zabezpieczenie, jeśli graf ma tylko 1 punkt lub wszystkie w tym samym miejscu
+        if (graphWidth == 0) graphWidth = 1;
+        if (graphHeight == 0) graphHeight = 1;
+
+        // 3. Obliczamy skalę (z Twoim paddingiem 0.7)
+        double padding = 0.7;
+        double scaleX = getWidth() * padding / graphWidth;
+        double scaleY = getHeight() * padding / graphHeight;
+
+        // Wybieramy mniejszą skalę, żeby graf zmieścił się w obu osiach
+        state.zoomFactor = Math.min(scaleX, scaleY);
+
+        // 4. Obliczamy przesunięcie (Offset)
+        // Chcemy, aby środek grafu wylądował na środku panelu
+        double graphCenterX = (minX + maxX) / 2.0;
+        double graphCenterY = (minY + maxY) / 2.0;
+
+        state.offsetX = (getWidth() / 2.0) - (graphCenterX * state.zoomFactor);
+        state.offsetY = (getHeight() / 2.0) - (graphCenterY * state.zoomFactor);
+
+        repaint();
+    }
+
 }
