@@ -46,6 +46,16 @@ public class MainFrame extends JFrame {
         JButton btnZoomIn = new JButton("Zoom +");
         JButton btnZoomOut = new JButton("Zoom -");
         JButton btnSave = new JButton("Zapisz Coords");
+        JButton btnReset = new JButton("Resetuj układ");
+        btnReset.setToolTipText("Wczytuje współrzędne ponownie z pliku coords.txt");
+
+        btnReset.addActionListener(e -> {
+            // Wywołujemy odświeżanie z panelu
+            graphPanel.refreshFromFile();
+        });
+
+// Dodajemy do paska (np. obok przycisku Centruj)
+        bar.add(btnReset);
 
         btnCenter.addActionListener(e -> graphPanel.centerView());
 

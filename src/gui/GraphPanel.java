@@ -1,5 +1,6 @@
 package gui;
 
+import io.CoordinatesReader;
 import models.Edge;
 import models.Graph;
 import models.Vertex;
@@ -134,6 +135,25 @@ public class GraphPanel extends JPanel {
         state.offsetY = (getHeight() / 2.0) - (graphCenterY * state.zoomFactor);
 
         repaint();
+    }
+
+    public void refreshFromFile() {
+        try {
+            CoordinatesReader coordsReader = new CoordinatesReader();
+            // Ścieżka do Twojego pliku ze współrzędnymi
+            coordsReader.updateCoordinates("src/data/coords.txt", this.graph);
+
+            // Po aktualizacji danych wymuszamy wycentrowanie grafu
+            centerView();
+
+            // Odświeżamy widok
+            repaint();
+
+            System.out.println("Pomyślnie zresetowano pozycje z pliku.");
+        } catch (java.io.FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "Nie znaleziono pliku coords.txt!",
+                    "Błąd", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 }
