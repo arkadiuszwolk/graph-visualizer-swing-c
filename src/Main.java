@@ -8,13 +8,12 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         Graph graph = new Graph();
-
         GraphReader gReader = new GraphReader();
         CoordinatesReader cReader = new CoordinatesReader();
 
         try {
             System.out.println("Wczytywanie struktury grafu...");
-            gReader.readFromTextFile("src/data/edges.txt", graph);
+            gReader.loadGraph("src/data/edges.txt", graph);
 
             System.out.println("Wczytywanie współrzędnych...");
             cReader.updateCoordinates("src/data/coords.txt", graph);
@@ -28,6 +27,7 @@ public class Main {
 
         } catch (Exception e) {
             System.err.println("Błąd krytyczny podczas startu aplikacji:");
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
 
             JOptionPane.showMessageDialog(null,

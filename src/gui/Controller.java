@@ -1,17 +1,20 @@
 package gui;
 
+import io.CoordinatesReader;
 import models.Graph;
 import models.Vertex;
+
+import javax.swing.*;
 import java.awt.event.*;
 import java.awt.Point;
 
-public class GraphController extends MouseAdapter {
+public class Controller extends MouseAdapter {
     private final Graph graph;
-    private final GraphState state;
+    private final State state;
     private final GraphPanel panel;
     private final InfoPanel infoPanel;
 
-    public GraphController(Graph graph, GraphState state, GraphPanel panel, InfoPanel infoPanel) {
+    public Controller(Graph graph, State state, GraphPanel panel, InfoPanel infoPanel) {
         this.graph = graph;
         this.state = state;
         this.panel = panel;
@@ -21,6 +24,10 @@ public class GraphController extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         state.lastMousePosition = e.getPoint();
+
+        // Jeśli kliknięto wierzchołek zapisuje się on w stanie,
+        // Jeśli nie trafiono w wierzchołek findVertexAt(...) zwraca null
+        // i ustawia go w stanie (efekt odkliknięcia)
         state.selectedVertex = findVertexAt(e.getPoint());
 
         if (state.selectedVertex != null) {
@@ -35,12 +42,18 @@ public class GraphController extends MouseAdapter {
     public void mouseDragged(MouseEvent e) {
         Point currentPoint = e.getPoint();
 
+        // Gałąź #1 (Kliknięcie wierzchołka i przeciąganie)
+        // Przeliczanie położenia kursora (świat pikseli ekranu) na współrzędne grafu (świat współrzędnych grafu)
+        // Korzystamy z operacji odwrotnej do tej przy rysowaniu Edge
+        // Aktualizacja współrzędnych w instancji grafu
         if (state.isDraggingVertex && state.selectedVertex != null) {
             double worldX = (currentPoint.x - state.offsetX) / state.zoomFactor;
             double worldY = (currentPoint.y - state.offsetY) / state.zoomFactor;
             state.selectedVertex.setX(worldX);
             state.selectedVertex.setY(worldY);
         } else {
+            // Gałąź #2 (Kliknięcie poza wierzchołkiem i przeciąganie)
+            // Zwykła zmiana offsetu w state
             if (state.lastMousePosition != null) {
                 state.offsetX += currentPoint.x - state.lastMousePosition.x;
                 state.offsetY += currentPoint.y - state.lastMousePosition.y;
@@ -54,6 +67,8 @@ public class GraphController extends MouseAdapter {
     @Override
     public void mouseMoved(MouseEvent e) {
         Vertex found = findVertexAt(e.getPoint());
+
+        // Zmiana stanu wierzchołka nad którym jest kursor na :hovered
         if (found != state.hoveredVertex) {
             state.hoveredVertex = found;
             panel.repaint();
@@ -122,5 +137,19 @@ public class GraphController extends MouseAdapter {
 
         panel.repaint();
         infoPanel.updateInfo();
+    }
+
+    public void refreshFromFile() {
+        try {
+            CoordinatesReader coordsReader = new CoordinatesReader();
+            coordsReader.updateCoordinates("src/data/coords.txt", this.graph);
+
+            panel.centerView();
+            panel.repaint();
+
+            System.out.println("Pomyślnie zresetowano pozycje z pliku.");
+        } catch (java.io.FileNotFoundException e) {
+            JOptionPane.showMessageDialog(panel, "Nie znaleziono pliku coords.txt!", "Błąd", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

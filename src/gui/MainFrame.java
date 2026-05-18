@@ -5,7 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
-    private GraphState state;
+    private State state;
     private GraphPanel graphPanel;
     private InfoPanel infoPanel;
 
@@ -15,11 +15,11 @@ public class MainFrame extends JFrame {
         setSize(1200, 800);
         setLayout(new BorderLayout());
 
-        state = new GraphState();
+        state = new State();
         graphPanel = new GraphPanel(graph, state);
         infoPanel = new InfoPanel(graph, state);
 
-        GraphController controller = new GraphController(graph, state, graphPanel, infoPanel);
+        Controller controller = new Controller(graph, state, graphPanel, infoPanel);
 
         graphPanel.addMouseListener(controller);
         graphPanel.addMouseMotionListener(controller);
@@ -36,7 +36,7 @@ public class MainFrame extends JFrame {
         infoPanel.updateInfo();
     }
 
-    private JToolBar createToolBar(GraphController controller) {
+    private JToolBar createToolBar(Controller controller) {
         JToolBar bar = new JToolBar();
         bar.setFloatable(false);
 
@@ -49,7 +49,7 @@ public class MainFrame extends JFrame {
         btnReset.setToolTipText("Wczytuje współrzędne ponownie z pliku coords.txt");
 
         btnReset.addActionListener(e -> {
-            graphPanel.refreshFromFile();
+            controller.refreshFromFile();
             infoPanel.updateInfo(); // Aktualizujemy info po resecie
         });
 

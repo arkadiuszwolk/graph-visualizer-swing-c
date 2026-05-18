@@ -16,6 +16,10 @@ public class Graph {
         edges.add(new Edge(label, vStart, vEnd, weight));
     }
 
+    public Vertex getVertex(String id) {
+        return vertices.get(id);
+    }
+
     public Collection<Vertex> getVertices() {
         return vertices.values();
     }
@@ -27,9 +31,5 @@ public class Graph {
     public void clear() {
         vertices.clear();
         edges.clear();
-    }
-
-    public Vertex getVertex(String id) {
-        return vertices.get(id);
     }
 }
