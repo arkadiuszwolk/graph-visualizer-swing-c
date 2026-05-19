@@ -1,9 +1,8 @@
-import models.Graph;
-import io.GraphReader;
-import io.CoordinatesReader;
 import gui.MainFrame;
-
+import io.CoordinatesReader;
+import io.GraphReader;
 import javax.swing.*;
+import models.Graph;
 
 public class Main {
     public static void main(String[] args) {
