@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class InfoPanel extends JPanel {
     private final Graph graph;
-    private final State state;
+    private final GraphState state;
 
     // Etykiety dla informacji o grafie
     private JLabel labelVertexCount = new JLabel("Wierzchołki: 0");
@@ -16,10 +16,10 @@ public class InfoPanel extends JPanel {
 
     // Etykiety dla informacji o zaznaczonym wierzchołku
     private JLabel labelNodeName = new JLabel("Nazwa: -");
-    private JLabel labelNodePosition = new JLabel("Pozycja X: -,Y: -");
+    private JLabel labelNodePosition = new JLabel("Pozycja X,Y: -");
     private JLabel labelNodeEdges = new JLabel("Krawędzie incyd.: 0");
 
-    public InfoPanel(Graph graph, State state) {
+    public InfoPanel(Graph graph, GraphState state) {
         this.graph = graph;
         this.state = state;
 
@@ -46,6 +46,7 @@ public class InfoPanel extends JPanel {
         setupLabel(labelNodeEdges, pnlDetails);
 
         add(pnlGeneral);
+//        add(Box.createVerticalStrut(10)); // Odstęp
         add(pnlDetails);
         add(Box.createVerticalGlue()); // Pcha wszystko do góry
     }
@@ -69,16 +70,16 @@ public class InfoPanel extends JPanel {
         Vertex sel = state.selectedVertex;
         if (sel != null) {
             labelNodeName.setText("Nazwa: " + sel.getId());
-            labelNodePosition.setText(String.format("Pozycja X: %.1f, Y: %.1f", sel.getX(), sel.getY()));
+            labelNodePosition.setText(String.format("Pozycja X,Y: %.1f, %.1f", sel.getX(), sel.getY()));
             // Liczenie krawędzi dla tego wierzchołka
             long count = graph.getEdges().stream()
                     .filter(e -> e.getStart().equals(sel) || e.getEnd().equals(sel))
                     .count();
-            labelNodeEdges.setText("Krawędzie: " + count);
+            labelNodeEdges.setText("Krawędzie incyd.: " + count);
         } else {
             labelNodeName.setText("Nazwa: -");
             labelNodePosition.setText("Pozycja X,Y: -");
-            labelNodeEdges.setText("Krawędzie: 0");
+            labelNodeEdges.setText("Krawędzie incyd.: 0");
         }
     }
 

@@ -3,17 +3,12 @@ package gui;
 import io.GraphReader;
 import java.awt.*;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Locale;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import models.Graph;
-import models.Vertex;
 
 public class MainFrame extends JFrame {
-    private State state;
+    private GraphState state;
     private GraphPanel graphPanel;
     private InfoPanel infoPanel;
 
@@ -29,12 +24,11 @@ public class MainFrame extends JFrame {
         setSize(1200, 800);
         setLayout(new BorderLayout());
 
-        state = new State();
+        state      = new GraphState();
         graphPanel = new GraphPanel(graph, state);
         infoPanel  = new InfoPanel(graph, state);
 
-        Controller controller = new Controller(graph, state, graphPanel, infoPanel);
-
+        GraphController controller = new GraphController(graph, state, graphPanel, infoPanel);
         graphPanel.addMouseListener(controller);
         graphPanel.addMouseMotionListener(controller);
         graphPanel.addMouseWheelListener(controller);
@@ -47,7 +41,7 @@ public class MainFrame extends JFrame {
         infoPanel.updateInfo();
     }
 
-    private JToolBar createToolBar(Controller controller) {
+    private JToolBar createToolBar(GraphController controller) {
         JToolBar bar = new JToolBar();
         bar.setFloatable(false);
 
@@ -58,8 +52,6 @@ public class MainFrame extends JFrame {
         JButton btnZoomIn  = new JButton("Zoom +");
         JButton btnZoomOut = new JButton("Zoom -");
         JButton btnSave    = new JButton("Zapisz Coords");
-        btnSave.setToolTipText("Zapisuje aktualne pozycje wierzchołków do pliku coords.txt");
-        btnSave.addActionListener(e -> saveCoords());
 
         btnReset.setToolTipText("Wczytuje współrzędne ponownie z pliku coords.txt");
         btnReset.addActionListener(e -> { graphPanel.refreshFromFile(); infoPanel.updateInfo(); });
@@ -67,10 +59,7 @@ public class MainFrame extends JFrame {
         btnZoomIn .addActionListener(e -> controller.zoomAroundCenter(1.2));
         btnZoomOut.addActionListener(e -> controller.zoomAroundCenter(0.8));
 
-        btnReset.addActionListener(e -> {
-            controller.refreshFromFile();
-            infoPanel.updateInfo(); // Aktualizujemy info po resecie
-        });
+        // ── Nowy: Wczytaj graf (automatycznie odpala algorytm) ────────────
 
         JButton btnLoad = new JButton("Wczytaj Graf");
         btnLoad.setToolTipText("Wybierz plik z krawędziami — algorytm uruchomi się automatycznie");
@@ -141,45 +130,6 @@ public class MainFrame extends JFrame {
         if (currentEdgesFile == null) return;
         AlgorithmRunner.run(graph, selectedAlgorithm, currentEdgesFile, graphPanel, null);
         infoPanel.updateInfo();
-    }
-
-    private void saveCoords() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Zapisz współrzędne wierzchołków");
-        chooser.setFileFilter(new FileNameExtensionFilter("Pliki tekstowe (*.txt)", "txt"));
-        chooser.setCurrentDirectory(new File("src/data"));
-        chooser.setSelectedFile(new File("coords.txt"));
-
-        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
-
-        File file = chooser.getSelectedFile();
-
-        // Dopisz rozszerzenie .txt jeśli brak
-        if (!file.getName().toLowerCase().endsWith(".txt")) {
-            file = new File(file.getAbsolutePath() + ".txt");
-        }
-
-        // Ostrzeżenie o nadpisaniu
-        if (file.exists()) {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Plik już istnieje. Czy chcesz go nadpisać?",
-                    "Potwierdzenie", JOptionPane.YES_NO_OPTION);
-            if (confirm != JOptionPane.YES_OPTION) return;
-        }
-
-        try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
-            for (Vertex v : graph.getVertices()) {
-                pw.printf(Locale.US, "%s %.6f %.6f%n", v.getId(), v.getX(), v.getY());
-            }
-            JOptionPane.showMessageDialog(this,
-                    "Zapisano " + graph.getVertices().size() + " wierzchołków do:\n" + file.getAbsolutePath(),
-                    "Sukces", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("Zapisano współrzędne do: " + file.getAbsolutePath());
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Błąd zapisu pliku:\n" + ex.getMessage(),
-                    "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     public GraphPanel getGraphPanel() {
