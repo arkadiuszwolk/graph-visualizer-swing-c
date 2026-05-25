@@ -3,9 +3,14 @@ package gui;
 import io.GraphReader;
 import java.awt.*;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Locale;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import models.Graph;
+import models.Vertex;
 
 public class MainFrame extends JFrame {
     private GraphState state;
@@ -52,6 +57,8 @@ public class MainFrame extends JFrame {
         JButton btnZoomIn  = new JButton("Zoom +");
         JButton btnZoomOut = new JButton("Zoom -");
         JButton btnSave    = new JButton("Zapisz Coords");
+        btnSave.setToolTipText("Zapisuje aktualne pozycje wierzchołków do pliku coords.txt");
+        btnSave.addActionListener(e -> saveCoords());
 
         btnReset.setToolTipText("Wczytuje współrzędne ponownie z pliku coords.txt");
         btnReset.addActionListener(e -> { graphPanel.refreshFromFile(); infoPanel.updateInfo(); });
@@ -130,6 +137,45 @@ public class MainFrame extends JFrame {
         if (currentEdgesFile == null) return;
         AlgorithmRunner.run(graph, selectedAlgorithm, currentEdgesFile, graphPanel, null);
         infoPanel.updateInfo();
+    }
+
+    private void saveCoords() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Zapisz współrzędne wierzchołków");
+        chooser.setFileFilter(new FileNameExtensionFilter("Pliki tekstowe (*.txt)", "txt"));
+        chooser.setCurrentDirectory(new File("src/data"));
+        chooser.setSelectedFile(new File("coords.txt"));
+
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        File file = chooser.getSelectedFile();
+
+        // Dopisz rozszerzenie .txt jeśli brak
+        if (!file.getName().toLowerCase().endsWith(".txt")) {
+            file = new File(file.getAbsolutePath() + ".txt");
+        }
+
+        // Ostrzeżenie o nadpisaniu
+        if (file.exists()) {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Plik już istnieje. Czy chcesz go nadpisać?",
+                    "Potwierdzenie", JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) return;
+        }
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
+            for (Vertex v : graph.getVertices()) {
+                pw.printf(Locale.US, "%s %.6f %.6f%n", v.getId(), v.getX(), v.getY());
+            }
+            JOptionPane.showMessageDialog(this,
+                    "Zapisano " + graph.getVertices().size() + " wierzchołków do:\n" + file.getAbsolutePath(),
+                    "Sukces", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("Zapisano współrzędne do: " + file.getAbsolutePath());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Błąd zapisu pliku:\n" + ex.getMessage(),
+                    "Błąd", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public GraphPanel getGraphPanel() {
