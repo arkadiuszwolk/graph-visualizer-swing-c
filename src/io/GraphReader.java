@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class GraphReader {
-    public void readFromTextFile(String filePath, Graph graph) throws FileNotFoundException {
+    public void loadGraph(String filePath, Graph graph) throws FileNotFoundException {
         File file = new File(filePath);
         try (Scanner scanner = new Scanner(file)) {
             scanner.useLocale(Locale.US);
