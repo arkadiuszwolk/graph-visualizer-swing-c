@@ -10,9 +10,9 @@ import java.awt.*;
 
 public class GraphPanel extends JPanel {
     private final Graph graph;
-    private final GraphState state;
+    private final State state;
 
-    public GraphPanel(Graph graph, GraphState state) {
+    public GraphPanel(Graph graph, State state) {
         this.graph = graph;
         this.state = state;
         setBackground(Color.WHITE);

@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class InfoPanel extends JPanel {
     private final Graph graph;
-    private final GraphState state;
+    private final State state;
 
     // Etykiety dla informacji o grafie
     private JLabel labelVertexCount = new JLabel("Wierzchołki: 0");
@@ -19,7 +19,7 @@ public class InfoPanel extends JPanel {
     private JLabel labelNodePosition = new JLabel("Pozycja X,Y: -");
     private JLabel labelNodeEdges = new JLabel("Krawędzie incyd.: 0");
 
-    public InfoPanel(Graph graph, GraphState state) {
+    public InfoPanel(Graph graph, State state) {
         this.graph = graph;
         this.state = state;
 

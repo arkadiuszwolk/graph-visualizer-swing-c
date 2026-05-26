@@ -78,12 +78,12 @@ public class Controller extends MouseAdapter {
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         double oldZoom = state.zoomFactor;
-        double zoomAmount = 0.1;
+        double zoomAmount = 1.1;
 
         if (e.getWheelRotation() < 0) {
-            state.zoomFactor += zoomAmount;
+            state.zoomFactor *= zoomAmount;
         } else {
-            state.zoomFactor = Math.max(0.1, state.zoomFactor - zoomAmount);
+            state.zoomFactor = Math.max(0.1, state.zoomFactor / zoomAmount);
         }
 
         Point mousePoint = e.getPoint();
